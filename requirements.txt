@@ -51,3 +51,4 @@ wcwidth~=0.2.5
 webencodings~=0.5.1
 wrapt~=1.12.1
 yarl~=1.9.4
+nest_asyncio~=1.6.0

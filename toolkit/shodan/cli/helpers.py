@@ -1,6 +1,6 @@
-'''
+"""
 Helper methods used across the CLI commands.
-'''
+"""
 import click
 import datetime
 import gzip
@@ -12,13 +12,13 @@ from ipaddress import ip_network, ip_address
 from .settings import SHODAN_CONFIG_DIR
 
 try:
-    basestring            # Python 2
+    basestring  # Python 2
 except NameError:
-    basestring = (str, )  # Python 3
+    basestring = (str,)  # Python 3
 
 
 def get_api_key():
-    '''Returns the API key of the current logged-in user.'''
+    """Returns the API key of the current logged-in user."""
     shodan_dir = os.path.expanduser(SHODAN_CONFIG_DIR)
     keyfile = shodan_dir + '/api_key'
 

@@ -1,4 +1,3 @@
-
 from .base import Converter
 from ...helpers import iterate_files, get_ip
 
@@ -7,7 +6,6 @@ from xlsxwriter import Workbook
 
 
 class ExcelConverter(Converter):
-
     fields = [
         'port',
         'timestamp',
@@ -113,7 +111,7 @@ class ExcelConverter(Converter):
             summary_sheet.write(row, col, key)
             summary_sheet.write(row, col + 1, value)
             row += 1
-        
+
         workbook.close()
 
     def banner_field(self, banner, flat_field):

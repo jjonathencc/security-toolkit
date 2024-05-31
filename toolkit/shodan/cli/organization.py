@@ -1,7 +1,7 @@
 import click
-import shodan
+import toolkit.shodan as shodan
 
-from shodan.cli.helpers import get_api_key, humanize_api_plan
+from toolkit.shodan.cli.helpers import get_api_key, humanize_api_plan
 
 
 @click.group()

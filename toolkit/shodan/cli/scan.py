@@ -1,14 +1,14 @@
 import click
 import collections
 import datetime
-import shodan
-import shodan.helpers as helpers
+import toolkit.shodan as shodan
+import toolkit.shodan.helpers as helpers
 import socket
 import threading
 import time
 
-from shodan.cli.helpers import get_api_key, async_spinner
-from shodan.cli.settings import COLORIZE_FIELDS
+from toolkit.shodan.cli.helpers import get_api_key, async_spinner
+from toolkit.shodan.cli.settings import COLORIZE_FIELDS
 
 
 @click.group()
@@ -66,7 +66,8 @@ def scan_internet(quiet, port, protocol):
         # let the user decide when to stop waiting for further results.
         official_ports = api.ports()
         if port in official_ports:
-            click.echo('The requested port is already indexed by Shodan. A new scan for the port has been launched, please subscribe to the real-time stream for results.')
+            click.echo(
+                'The requested port is already indexed by Shodan. A new scan for the port has been launched, please subscribe to the real-time stream for results.')
         else:
             # Create the output file
             filename = '{0}-{1}.json.gz'.format(port, protocol)
@@ -131,7 +132,9 @@ def scan_protocols():
 
 
 @scan.command(name='submit')
-@click.option('--wait', help='How long to wait for results to come back. If this is set to "0" or below return immediately.', default=20, type=int)
+@click.option('--wait',
+              help='How long to wait for results to come back. If this is set to "0" or below return immediately.',
+              default=20, type=int)
 @click.option('--filename', help='Save the results in the given file.', default='', type=str)
 @click.option('--force', default=False, is_flag=True)
 @click.option('--verbose', default=False, is_flag=True)
@@ -158,7 +161,8 @@ def scan_submit(wait, filename, force, verbose, netblocks):
         # Return immediately
         if wait <= 0:
             click.echo('Scan ID: {}'.format(scan['id']))
-            click.echo('Exiting now, not waiting for results. Use the API or website to retrieve the results of the scan.')
+            click.echo(
+                'Exiting now, not waiting for results. Use the API or website to retrieve the results of the scan.')
         else:
             # Setup an alert to wait for responses
             alert = api.create_alert('Scan: {}'.format(', '.join(netblocks)), netblocks)
@@ -244,7 +248,9 @@ def scan_submit(wait, filename, force, verbose, netblocks):
                 click.echo('  {:25s}{}'.format(name, value))
 
             def print_banner(banner):
-                click.echo('    {:20s}'.format(click.style(str(banner['port']), fg='green') + '/' + banner['transport']), nl=False)
+                click.echo(
+                    '    {:20s}'.format(click.style(str(banner['port']), fg='green') + '/' + banner['transport']),
+                    nl=False)
 
                 if 'product' in banner:
                     click.echo(banner['product'], nl=False)
@@ -258,14 +264,19 @@ def scan_submit(wait, filename, force, verbose, netblocks):
                 if 'ssl' in banner:
                     if 'versions' in banner['ssl']:
                         # Only print SSL versions if they were successfully tested
-                        versions = [version for version in sorted(banner['ssl']['versions']) if not version.startswith('-')]
+                        versions = [version for version in sorted(banner['ssl']['versions']) if
+                                    not version.startswith('-')]
                         if len(versions) > 0:
                             click.echo('    |-- SSL Versions: {}'.format(', '.join(versions)))
                     if 'dhparams' in banner['ssl'] and banner['ssl']['dhparams']:
                         click.echo('    |-- Diffie-Hellman Parameters:')
-                        click.echo('        {:15s}{}\n        {:15s}{}'.format('Bits:', banner['ssl']['dhparams']['bits'], 'Generator:', banner['ssl']['dhparams']['generator']))
+                        click.echo(
+                            '        {:15s}{}\n        {:15s}{}'.format('Bits:', banner['ssl']['dhparams']['bits'],
+                                                                        'Generator:',
+                                                                        banner['ssl']['dhparams']['generator']))
                         if 'fingerprint' in banner['ssl']['dhparams']:
-                            click.echo('        {:15s}{}'.format('Fingerprint:', banner['ssl']['dhparams']['fingerprint']))
+                            click.echo(
+                                '        {:15s}{}'.format('Fingerprint:', banner['ssl']['dhparams']['fingerprint']))
 
             if hosts:
                 # Remove the remaining spinner character
@@ -321,7 +332,8 @@ def scan_submit(wait, filename, force, verbose, netblocks):
                     click.echo('')
             else:
                 # Prepend a \b to remove the spinner
-                click.echo('\bNo open ports found or the host has been recently crawled and cant get scanned again so soon.')
+                click.echo(
+                    '\bNo open ports found or the host has been recently crawled and cant get scanned again so soon.')
     except shodan.APIError as e:
         raise click.ClickException(e.value)
     finally:

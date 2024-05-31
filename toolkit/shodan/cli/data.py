@@ -1,9 +1,9 @@
 import click
 import requests
-import shodan
-import shodan.helpers as helpers
+import toolkit.shodan as shodan
+import toolkit.shodan.helpers as helpers
 
-from shodan.cli.helpers import get_api_key
+from toolkit.shodan.cli.helpers import get_api_key
 
 
 @click.group()
@@ -31,7 +31,7 @@ def data_list(dataset):
             # Show the SHA1 checksum if available
             if file.get('sha1'):
                 click.echo(click.style('{:42s}'.format(file['sha1']), fg='green'), nl=False)
-            
+
             click.echo('{}'.format(file['url']))
     else:
         # If no dataset was provided then show a list of all datasets
@@ -43,7 +43,8 @@ def data_list(dataset):
 
 
 @data.command(name='download')
-@click.option('--chunksize', help='The size of the chunks that are downloaded into memory before writing them to disk.', default=1024, type=int)
+@click.option('--chunksize', help='The size of the chunks that are downloaded into memory before writing them to disk.',
+              default=1024, type=int)
 @click.option('--filename', '-O', help='Save the file as the provided filename instead of the default.')
 @click.argument('dataset', metavar='<dataset>')
 @click.argument('name', metavar='<file>')

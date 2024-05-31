@@ -1,4 +1,3 @@
-
 from os import path
 
 if path.exists(path.expanduser("~/.shodan")):

@@ -18,7 +18,6 @@ from .exception import APIError
 from .helpers import create_facet_string
 from .stream import Stream
 
-
 # Try to disable the SSL warnings in urllib3 since not everybody can install
 # C extensions. If you're able to install C extensions you can try to run:
 #
@@ -319,7 +318,7 @@ class Shodan:
         if proxies:
             self._session.proxies.update(proxies)
             self._session.trust_env = False
-        
+
         if os.environ.get('SHODAN_API_URL'):
             self.base_url = os.environ.get('SHODAN_API_URL')
 
@@ -355,9 +354,9 @@ class Shodan:
             if method == 'post':
                 if json_data:
                     data = self._session.post(base_url + function, params=params,
-                                            data=json.dumps(json_data),
-                                            headers={'content-type': 'application/json'},
-                        )
+                                              data=json.dumps(json_data),
+                                              headers={'content-type': 'application/json'},
+                                              )
                 else:
                     data = self._session.post(base_url + function, params)
             elif method == 'put':
@@ -595,7 +594,7 @@ class Shodan:
         results = self.search(query, minify=minify, page=page, fields=fields)
         if results['total']:
             total_pages = int(math.ceil(results['total'] / 100))
-                    
+
         for banner in results['matches']:
             try:
                 yield banner
@@ -788,13 +787,17 @@ class Shodan:
         # to ignore. If a user provides a "vulns" list and specifies on of those triggers then we'll use
         # a different API endpoint.
         if trigger in ('vulnerable', 'vulnerable_unverified') and vulns and isinstance(vulns, list):
-            return self._request('/shodan/alert/{}/trigger/{}/ignore/{}:{}/{}'.format(aid, trigger, ip, port, ','.join(vulns)), {}, method='put')
+            return self._request(
+                '/shodan/alert/{}/trigger/{}/ignore/{}:{}/{}'.format(aid, trigger, ip, port, ','.join(vulns)), {},
+                method='put')
 
-        return self._request('/shodan/alert/{}/trigger/{}/ignore/{}:{}'.format(aid, trigger, ip, port), {}, method='put')
+        return self._request('/shodan/alert/{}/trigger/{}/ignore/{}:{}'.format(aid, trigger, ip, port), {},
+                             method='put')
 
     def unignore_alert_trigger_notification(self, aid, trigger, ip, port):
         """Re-enable trigger notifications for the provided IP and port"""
-        return self._request('/shodan/alert/{}/trigger/{}/ignore/{}:{}'.format(aid, trigger, ip, port), {}, method='delete')
+        return self._request('/shodan/alert/{}/trigger/{}/ignore/{}:{}'.format(aid, trigger, ip, port), {},
+                             method='delete')
 
     def add_alert_notifier(self, aid, nid):
         """Enable the given notifier for an alert that has triggers enabled."""

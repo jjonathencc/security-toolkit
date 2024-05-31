@@ -23,6 +23,10 @@ class UrlScan:
         self.logger = logging.getLogger("urlscanio")
         self.logger.setLevel(log_level)
 
+        # Ensure directories exist
+        (self.data_dir / "screenshots").mkdir(parents=True, exist_ok=True)
+        (self.data_dir / "doms").mkdir(parents=True, exist_ok=True)
+
     async def __aenter__(self):
         return self
 

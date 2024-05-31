@@ -1,4 +1,3 @@
-
 from .base import Converter
 from ...helpers import iterate_files, get_ip, get_screenshot
 
@@ -9,7 +8,6 @@ import os
 
 
 class ImagesConverter(Converter):
-
     # The Images converter is special in that it creates a directory and there's
     # special code in the Shodan CLI that relies on the "dirname" property to let
     # the user know where the images have been stored.

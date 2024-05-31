@@ -1,4 +1,4 @@
-'''
+"""
 F-Secure Virus World Map console edition
 
 See README.md for more details
@@ -11,15 +11,14 @@ See LICENSE.txt or http://www.opensource.org/licenses/mit-license.php
 ASCII map in map-world-01.txt is copyright:
  "Map 1998 Matthew Thomas. Freely usable as long as this line is included"
 
-'''
+"""
 import curses
 import locale
 import random
 import time
 
-from shodan.exception import APIError
-from shodan.helpers import get_ip
-
+from toolkit.shodan.exception import APIError
+from toolkit.shodan.helpers import get_ip
 
 MAPS = {
     'world': {
@@ -62,6 +61,7 @@ class AsciiMap(object):
     """
     Helper class for handling map drawing and coordinate calculations
     """
+
     def __init__(self, map_name='world', map_conf=None, window=None, encoding=None):
         if map_conf is None:
             map_conf = MAPS[map_name]
@@ -132,10 +132,10 @@ class AsciiMap(object):
                     desc += ' {}'.format(banner['location']['city'])
                 except Exception:
                     pass
-            
+
             if 'tags' in banner and banner['tags']:
                 desc += ' / {}'.format(','.join(banner['tags']))
-            
+
             entry = (
                 float(banner['location']['latitude']),
                 float(banner['location']['longitude']),
@@ -184,6 +184,7 @@ class AsciiMap(object):
 
 class MapApp(object):
     """ Virus World Map ncurses application """
+
     def __init__(self, api):
         self.api = api
         self.data = None
@@ -199,7 +200,7 @@ class MapApp(object):
         else:
             if self.last_fetch + self.polling_interval <= epoch_now:
                 refresh = True
-        
+
         if refresh:
             try:
                 # Grab 20 banners from the main stream
@@ -249,8 +250,8 @@ def launch_map(api):
 
 def main(argv=None):
     """ Main function / entry point """
-    from shodan import Shodan
-    from shodan.cli.helpers import get_api_key
+    from toolkit.shodan import Shodan
+    from toolkit.shodan.cli.helpers import get_api_key
 
     api = Shodan(get_api_key())
     return launch_map(api)
@@ -258,4 +259,5 @@ def main(argv=None):
 
 if __name__ == '__main__':
     import sys
+
     sys.exit(main())

@@ -1,4 +1,3 @@
-
 from .base import Converter
 from ...helpers import iterate_files
 
@@ -13,7 +12,6 @@ from csv import writer as csv_writer, excel
 
 
 class CsvConverter(Converter):
-
     fields = [
         'data',
         'hostnames',
@@ -60,7 +58,8 @@ class CsvConverter(Converter):
             # The "vulns" property can't be nicely flattened as-is so we turn
             # it into a list before processing the banner.
             if 'vulns' in banner:
-                banner['vulns'] = list(banner['vulns'].keys())  # Python3 returns dict_keys so we neeed to cover that to a list
+                banner['vulns'] = list(
+                    banner['vulns'].keys())  # Python3 returns dict_keys so we neeed to cover that to a list
 
             try:
                 row = []

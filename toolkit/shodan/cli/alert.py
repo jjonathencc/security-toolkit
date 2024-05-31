@@ -2,17 +2,16 @@ import click
 import csv
 import gzip
 import json
-import shodan
+import toolkit.shodan as shodan
 from tldextract import extract
 from ipaddress import ip_address
 
 from collections import defaultdict
 from operator import itemgetter
-from shodan import APIError
-from shodan.cli.helpers import get_api_key
-from shodan.helpers import open_file, write_banner
+from toolkit.shodan import APIError
+from toolkit.shodan.cli.helpers import get_api_key
+from toolkit.shodan.helpers import open_file, write_banner
 from time import sleep
-
 
 MAX_QUERY_LENGTH = 1000
 
@@ -22,6 +21,7 @@ def aggregate_facet(api, networks, facets):
     This is necessary because a user might be monitoring a lot of IPs/ networks so it doesn't fit
     into a single API call.
     """
+
     def _merge_custom_facets(lfacets, results):
         for key in results['facets']:
             if key not in lfacets:
@@ -118,7 +118,8 @@ def alert_create(name, netblocks):
 
 @alert.command(name='domain')
 @click.argument('domain', metavar='<domain>', type=str)
-@click.option('--triggers', help='List of triggers to enable', default='malware,industrial_control_system,internet_scanner,iot,open_database,new_service,ssl_expired,vulnerable')
+@click.option('--triggers', help='List of triggers to enable',
+              default='malware,industrial_control_system,internet_scanner,iot,open_database,new_service,ssl_expired,vulnerable')
 def alert_domain(domain, triggers):
     """Create a network alert based on a domain name"""
     key = get_api_key()
@@ -181,7 +182,7 @@ def alert_download(filename, alert_id):
             alerts = [api.alerts(aid=alert_id.strip())]
         else:
             alerts = api.alerts()
-        
+
         click.echo('Compiling list of networks/ IPs to download...')
         for alert in alerts:
             for net in alert['filters']['ip']:
@@ -189,7 +190,7 @@ def alert_download(filename, alert_id):
                     networks.add(net)
                 else:
                     ips.add(net)
-        
+
         click.echo('Downloading...')
         with open_file(filename) as fout:
             # Check if the user is able to use batch IP lookups
@@ -198,7 +199,7 @@ def alert_download(filename, alert_id):
                 api_info = api.info()
                 if api_info['plan'] in ['corp', 'stream-100']:
                     batch_size = 100
-            
+
             # Convert it to a list so we can index into it
             ips = list(ips)
 
@@ -209,14 +210,14 @@ def alert_download(filename, alert_id):
                     results = api.host(ip)
                     if not isinstance(results, list):
                         results = [results]
-                    
+
                     for host in results:
                         for banner in host['data']:
                             write_banner(fout, banner)
                 except APIError:
                     pass
                 sleep(1)  # Slow down a bit to make sure we don't hit the rate limit
-            
+
             # Grab all the network ranges
             for net in networks:
                 try:
@@ -224,7 +225,7 @@ def alert_download(filename, alert_id):
                     click.echo(net)
                     for banner in api.search_cursor('net:{}'.format(net)):
                         write_banner(fout, banner)
-                        
+
                         # Slow down a bit to make sure we don't hit the rate limit
                         if counter % 100 == 0:
                             sleep(1)
@@ -233,7 +234,7 @@ def alert_download(filename, alert_id):
                     pass
     except shodan.APIError as e:
         raise click.ClickException(e.value)
-    
+
     click.secho('Successfully downloaded results into: {}'.format(filename), fg='green')
 
 
@@ -256,7 +257,7 @@ def alert_export(filename):
             json.dump(alerts, fout)
     except Exception as e:
         raise click.ClickException(e.value)
-    
+
     click.secho('Successfully exported monitored networks', fg='green')
 
 
@@ -292,8 +293,9 @@ def alert_import(filename):
                     for trigger, info in item['triggers'].items():
                         if info.get('ignore', []):
                             for whitelist in info['ignore']:
-                                api.ignore_alert_trigger_notification(alert['id'], trigger, whitelist['ip'], whitelist['port'])
-                
+                                api.ignore_alert_trigger_notification(alert['id'], trigger, whitelist['ip'],
+                                                                      whitelist['port'])
+
                 # Enable the notifiers
                 for prev_notifier in item.get('notifiers', []):
                     # We don't need to do anything for the default notifier as that
@@ -303,10 +305,11 @@ def alert_import(filename):
 
                     # Get the new notifier based on the ID of the old one
                     notifier = notifier_map.get(prev_notifier['id'])
-                    
+
                     # Create the notifier if it doesn't yet exist
                     if notifier is None:
-                        notifier = api.notifier.create(prev_notifier['provider'], prev_notifier['args'], description=prev_notifier['description'])
+                        notifier = api.notifier.create(prev_notifier['provider'], prev_notifier['args'],
+                                                       description=prev_notifier['description'])
 
                         # Add it to our map of old notifier IDs to new notifiers
                         notifier_map[prev_notifier['id']] = notifier
@@ -314,7 +317,7 @@ def alert_import(filename):
                     api.add_alert_notifier(alert['id'], notifier['id'])
     except Exception as e:
         raise click.ClickException(e.value)
-    
+
     click.secho('Successfully imported monitored networks', fg='green')
 
 

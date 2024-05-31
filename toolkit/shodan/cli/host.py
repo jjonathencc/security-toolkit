@@ -1,7 +1,7 @@
 # Helper methods for printing `host` information to the terminal.
 import click
 
-from shodan.helpers import get_ip
+from toolkit.shodan.helpers import get_ip
 
 
 def host_print_pretty(host, history=False):
@@ -100,16 +100,20 @@ def host_print_pretty(host, history=False):
         if 'ssl' in banner:
             if 'cert' in banner['ssl'] and banner['ssl']['cert']:
                 if 'issuer' in banner['ssl']['cert'] and banner['ssl']['cert']['issuer']:
-                    issuer = ', '.join(['{}={}'.format(key, value) for key, value in banner['ssl']['cert']['issuer'].items()])
+                    issuer = ', '.join(
+                        ['{}={}'.format(key, value) for key, value in banner['ssl']['cert']['issuer'].items()])
                     click.echo('\t|-- Cert Issuer: {}'.format(issuer))
                 if 'subject' in banner['ssl']['cert'] and banner['ssl']['cert']['subject']:
-                    subject = ', '.join(['{}={}'.format(key, value) for key, value in banner['ssl']['cert']['subject'].items()])
+                    subject = ', '.join(
+                        ['{}={}'.format(key, value) for key, value in banner['ssl']['cert']['subject'].items()])
                     click.echo('\t|-- Cert Subject: {}'.format(subject))
             if 'versions' in banner['ssl'] and banner['ssl']['versions']:
-                click.echo('\t|-- SSL Versions: {}'.format(', '.join([item for item in sorted(banner['ssl']['versions']) if not version.startswith('-')])))
+                click.echo('\t|-- SSL Versions: {}'.format(
+                    ', '.join([item for item in sorted(banner['ssl']['versions']) if not version.startswith('-')])))
             if 'dhparams' in banner['ssl'] and banner['ssl']['dhparams']:
                 click.echo('\t|-- Diffie-Hellman Parameters:')
-                click.echo('\t\t{:15s}{}\n\t\t{:15s}{}'.format('Bits:', banner['ssl']['dhparams']['bits'], 'Generator:', banner['ssl']['dhparams']['generator']))
+                click.echo('\t\t{:15s}{}\n\t\t{:15s}{}'.format('Bits:', banner['ssl']['dhparams']['bits'], 'Generator:',
+                                                               banner['ssl']['dhparams']['generator']))
                 if 'fingerprint' in banner['ssl']['dhparams']:
                     click.echo('\t\t{:15s}{}'.format('Fingerprint:', banner['ssl']['dhparams']['fingerprint']))
 

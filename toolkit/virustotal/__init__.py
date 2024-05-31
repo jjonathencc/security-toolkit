@@ -20,3 +20,35 @@ from .feed import *
 from .iterator import *
 from .object import *
 from .version import __version__
+
+import os
+import asyncio
+
+# Get API key from environment variable or set it to None
+api_key = os.getenv('VIRUSTOTAL_API_KEY')
+
+# Create a single instance of Client to use within this module
+if api_key:
+    _vt_client = Client(apikey=api_key)
+else:
+    _vt_client = None
+
+
+def scan_url(url, wait_for_completion=False):
+    """Scans a URL using the VirusTotal API and prints the results."""
+    if _vt_client:
+        result = asyncio.run(_vt_client.scan_url_async(url, wait_for_completion))
+        print(result)
+    else:
+        raise ValueError("API key not set. Please set the VIRUSTOTAL_API_KEY environment variable.")
+
+
+def get_url_analysis(url):
+    """Fetches and prints detailed analysis for a URL from VirusTotal."""
+    if _vt_client:
+        url_id = client.url_id(url)
+        url_analysis = _vt_client.get_object("/urls/{}", url_id)
+        print(f"Times Submitted: {url_analysis.times_submitted}")
+        print(f"Last Analysis Stats: {url_analysis.last_analysis_stats}")
+    else:
+        raise ValueError("API key not set. Please set the VIRUSTOTAL_API_KEY environment variable.")

@@ -6,7 +6,6 @@ from .exception import APIError
 
 
 class Stream:
-
     base_url = 'https://stream.shodan.io'
 
     def __init__(self, api_key, proxies=None):
@@ -135,7 +134,8 @@ class Stream:
         :param ports: A list of ports to return banner data on.
         :type ports: int[]
         """
-        stream = self._create_stream('/shodan/ports/{}'.format(','.join([str(port) for port in ports])), timeout=timeout)
+        stream = self._create_stream('/shodan/ports/{}'.format(','.join([str(port) for port in ports])),
+                                     timeout=timeout)
         for line in self._iter_stream(stream, raw):
             yield line
 

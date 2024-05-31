@@ -126,7 +126,7 @@ def get_screenshot(banner):
         return banner['screenshot']
     elif 'opts' in banner and 'screenshot' in banner['opts']:
         return banner['opts']['screenshot']
-    
+
     return None
 
 

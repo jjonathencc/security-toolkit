@@ -31,33 +31,33 @@ import csv
 import os
 import os.path
 import pkg_resources
-import shodan
-import shodan.helpers as helpers
+import toolkit.shodan as shodan
+import toolkit.shodan.helpers as helpers
 import threading
 import requests
 import time
 import json
 
 # The file converters that are used to go from .json.gz to various other formats
-from shodan.cli.converter import CsvConverter, KmlConverter, GeoJsonConverter, ExcelConverter, ImagesConverter
+from toolkit.shodan.cli.converter import CsvConverter, KmlConverter, GeoJsonConverter, ExcelConverter, ImagesConverter
 
 # Constants
-from shodan.cli.settings import SHODAN_CONFIG_DIR, COLORIZE_FIELDS
+from toolkit.shodan.cli.settings import SHODAN_CONFIG_DIR, COLORIZE_FIELDS
 
 # Helper methods
-from shodan.cli.helpers import async_spinner, get_api_key, escape_data, timestr, open_streaming_file, get_banner_field, match_filters
-from shodan.cli.host import HOST_PRINT
+from toolkit.shodan.cli.helpers import async_spinner, get_api_key, escape_data, timestr, open_streaming_file, \
+    get_banner_field, match_filters
+from toolkit.shodan.cli.host import HOST_PRINT
 
 # Allow 3rd-parties to develop custom commands
 from click_plugins import with_plugins
 from pkg_resources import iter_entry_points
 
 # Large subcommands are stored in separate modules
-from shodan.cli.alert import alert
-from shodan.cli.data import data
-from shodan.cli.organization import org
-from shodan.cli.scan import scan
-
+from toolkit.shodan.cli.alert import alert
+from toolkit.shodan.cli.data import data
+from toolkit.shodan.cli.organization import org
+from toolkit.shodan.cli.scan import scan
 
 # Make "-h" work like "--help"
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
@@ -108,7 +108,8 @@ def convert(fields, input, format):
     if fields:
         if not hasattr(converter_class, 'fields'):
             raise click.ClickException('File format doesnt support custom list of fields')
-        converter_class.fields = [item.strip() for item in fields.split(',')]  # Use the custom fields the user specified
+        converter_class.fields = [item.strip() for item in
+                                  fields.split(',')]  # Use the custom fields the user specified
 
     # click.Path ensures that file path exists
     file_size = os.path.getsize(input)
@@ -136,15 +137,18 @@ def convert(fields, input, format):
     progress_bar_thread.join()
 
     if format == 'images':
-        click.echo(click.style('\rSuccessfully extracted images to directory: {}'.format(converter.dirname), fg='green'))
+        click.echo(
+            click.style('\rSuccessfully extracted images to directory: {}'.format(converter.dirname), fg='green'))
     else:
         click.echo(click.style('\rSuccessfully created new file: {}'.format(filename), fg='green'))
 
 
 @main.command(name='domain')
 @click.argument('domain', metavar='<domain>')
-@click.option('--details', '-D', help='Lookup host information for any IPs in the domain results', default=False, is_flag=True)
-@click.option('--save', '-S', help='Save the information in the a file named after the domain (append if file exists).', default=False, is_flag=True)
+@click.option('--details', '-D', help='Lookup host information for any IPs in the domain results', default=False,
+              is_flag=True)
+@click.option('--save', '-S', help='Save the information in the a file named after the domain (append if file exists).',
+              default=False, is_flag=True)
 @click.option('--history', '-H', help='Include historical DNS data in the results', default=False, is_flag=True)
 @click.option('--type', '-T', help='Only returns DNS records of the provided type', default=None)
 def domain_info(domain, details, save, history, type):
@@ -203,7 +207,8 @@ def domain_info(domain, details, save, history, type):
 
         if record['value'] in hosts:
             host = hosts[record['value']]
-            click.secho(u' Ports: {}'.format(', '.join([str(port) for port in sorted(host['ports'])])), fg='blue', nl=False)
+            click.secho(u' Ports: {}'.format(', '.join([str(port) for port in sorted(host['ports'])])), fg='blue',
+                        nl=False)
 
         click.echo('')
 
@@ -261,8 +266,10 @@ def count(query):
 
 
 @main.command()
-@click.option('--fields', help='Specify the list of properties to download instead of grabbing the full banner', default=None, type=str)
-@click.option('--limit', help='The number of results you want to download. -1 to download all the data possible.', default=1000, type=int)
+@click.option('--fields', help='Specify the list of properties to download instead of grabbing the full banner',
+              default=None, type=str)
+@click.option('--limit', help='The number of results you want to download. -1 to download all the data possible.',
+              default=1000, type=int)
 @click.argument('filename', metavar='<filename>')
 @click.argument('query', metavar='<search query>', nargs=-1)
 def download(fields, limit, filename, query):
@@ -331,10 +338,14 @@ def download(fields, limit, filename, query):
 
 
 @main.command()
-@click.option('--format', help='The output format for the host information. Possible values are: pretty, tsv.', default='pretty', type=click.Choice(['pretty', 'tsv']))
+@click.option('--format', help='The output format for the host information. Possible values are: pretty, tsv.',
+              default='pretty', type=click.Choice(['pretty', 'tsv']))
 @click.option('--history', help='Show the complete history of the host.', default=False, is_flag=True)
-@click.option('--filename', '-O', help='Save the host information in the given file (append if file exists).', default=None)
-@click.option('--save', '-S', help='Save the host information in the a file named after the IP (append if file exists).', default=False, is_flag=True)
+@click.option('--filename', '-O', help='Save the host information in the given file (append if file exists).',
+              default=None)
+@click.option('--save', '-S',
+              help='Save the host information in the a file named after the IP (append if file exists).', default=False,
+              is_flag=True)
 @click.argument('ip', metavar='<ip address>')
 def host(format, history, filename, save, ip):
     """View all available information for an IP address"""
@@ -403,7 +414,8 @@ def parse(color, fields, filters, filename, separator, filenames):
     if filename:
         # If no filters were provided raise an error since it doesn't make much sense w/out them
         if not has_filters:
-            raise click.ClickException('Output file specified without any filters. Need to use filters with this option.')
+            raise click.ClickException(
+                'Output file specified without any filters. Need to use filters with this option.')
 
         # Add the appropriate extension if it's not there atm
         if not filename.endswith('.json.gz'):
@@ -468,8 +480,10 @@ def myip(ipv6):
 
 @main.command()
 @click.option('--color/--no-color', default=True)
-@click.option('--fields', help='List of properties to show in the search results.', default='ip_str,port,hostnames,data')
-@click.option('--limit', help='The number of search results that should be returned. Maximum: 1000', default=100, type=int)
+@click.option('--fields', help='List of properties to show in the search results.',
+              default='ip_str,port,hostnames,data')
+@click.option('--limit', help='The number of search results that should be returned. Maximum: 1000', default=100,
+              type=int)
 @click.option('--separator', help='The separator between the properties of the search results.', default='\t')
 @click.argument('query', metavar='<search query>', nargs=-1)
 def search(color, fields, limit, separator, query):
@@ -628,23 +642,32 @@ def stats(limit, facets, filename, query):
 
 
 @main.command()
-@click.option('--streamer', help='Specify a custom Shodan stream server to use for grabbing data.', default='https://stream.shodan.io', type=str)
+@click.option('--streamer', help='Specify a custom Shodan stream server to use for grabbing data.',
+              default='https://stream.shodan.io', type=str)
 @click.option('--fields', help='List of properties to output.', default='ip_str,port,hostnames,data')
 @click.option('--separator', help='The separator between the properties of the search results.', default='\t')
-@click.option('--datadir', help='Save the stream data into the specified directory as .json.gz files.', default=None, type=str)
+@click.option('--datadir', help='Save the stream data into the specified directory as .json.gz files.', default=None,
+              type=str)
 @click.option('--asn', help='A comma-separated list of ASNs to grab data on.', default=None, type=str)
-@click.option('--alert', help='The network alert ID or "all" to subscribe to all network alerts on your account.', default=None, type=str)
+@click.option('--alert', help='The network alert ID or "all" to subscribe to all network alerts on your account.',
+              default=None, type=str)
 @click.option('--countries', help='A comma-separated list of countries to grab data on.', default=None, type=str)
-@click.option('--custom-filters', help='A space-separated list of filters query to grab data on.', default=None, type=str)
+@click.option('--custom-filters', help='A space-separated list of filters query to grab data on.', default=None,
+              type=str)
 @click.option('--ports', help='A comma-separated list of ports to grab data on.', default=None, type=str)
 @click.option('--tags', help='A comma-separated list of tags to grab data on.', default=None, type=str)
 @click.option('--vulns', help='A comma-separated list of vulnerabilities to grab data on.', default=None, type=str)
-@click.option('--limit', help='The number of results you want to download. -1 to download all the data possible.', default=-1, type=int)
-@click.option('--compresslevel', help='The gzip compression level (0-9; 0 = no compression, 9 = most compression', default=9, type=int)
-@click.option('--timeout', help='Timeout. Should the shodan stream cease to send data, then timeout after <timeout> seconds.', default=0, type=int)
+@click.option('--limit', help='The number of results you want to download. -1 to download all the data possible.',
+              default=-1, type=int)
+@click.option('--compresslevel', help='The gzip compression level (0-9; 0 = no compression, 9 = most compression',
+              default=9, type=int)
+@click.option('--timeout',
+              help='Timeout. Should the shodan stream cease to send data, then timeout after <timeout> seconds.',
+              default=0, type=int)
 @click.option('--color/--no-color', default=True)
 @click.option('--quiet', help='Disable the printing of information to the screen.', is_flag=True)
-def stream(streamer, fields, separator, datadir, asn, alert, countries, custom_filters, ports, tags, vulns, limit, compresslevel, timeout, color, quiet):
+def stream(streamer, fields, separator, datadir, asn, alert, countries, custom_filters, ports, tags, vulns, limit,
+           compresslevel, timeout, color, quiet):
     """Stream data in real-time."""
     # Setup the Shodan API
     key = get_api_key()
@@ -678,7 +701,8 @@ def stream(streamer, fields, separator, datadir, asn, alert, countries, custom_f
         stream_type.append('custom_filters')
 
     if len(stream_type) > 1:
-        raise click.ClickException('Please use --ports, --countries, --custom, --tags, --vulns OR --asn. You cant subscribe to multiple filtered streams at once.')
+        raise click.ClickException(
+            'Please use --ports, --countries, --custom, --tags, --vulns OR --asn. You cant subscribe to multiple filtered streams at once.')
 
     stream_args = None
 
@@ -806,9 +830,12 @@ def stream(streamer, fields, separator, datadir, asn, alert, countries, custom_f
 
 
 @main.command()
-@click.option('--facets', help='List of facets to get summary information on, if empty then show query total results over time', default='', type=str)
+@click.option('--facets',
+              help='List of facets to get summary information on, if empty then show query total results over time',
+              default='', type=str)
 @click.option('--filename', '-O', help='Save the full results in the given file (append if file exists).', default=None)
-@click.option('--save', '-S', help='Save the full results in the a file named after the query (append if file exists).', default=False, is_flag=True)
+@click.option('--save', '-S', help='Save the full results in the a file named after the query (append if file exists).',
+              default=False, is_flag=True)
 @click.argument('query', metavar='<search query>', nargs=-1)
 def trends(filename, save, facets, query):
     """Search Shodan historical database"""
@@ -890,13 +917,15 @@ def trends(filename, save, facets, query):
                 for facet in result_facets:
                     output += click.style(u'  {}\n'.format(facet), fg='cyan')
                     for bucket in results['facets'][facet][index]['values']:
-                        output += u'    {:60}{}\n'.format(click.style(bucket['value'], bold=True), click.style(u'{:20,d}'.format(bucket['count']), fg='green'))
+                        output += u'    {:60}{}\n'.format(click.style(bucket['value'], bold=True),
+                                                          click.style(u'{:20,d}'.format(bucket['count']), fg='green'))
             else:
                 output += u'{}\n'.format(click.style('N/A', bold=True))
     else:
         # Without facets, show query total results over time
         for index, match in enumerate(results['matches']):
-            output += u'{:20}{}\n'.format(click.style(match['month'], bold=True), click.style(u'{:20,d}'.format(match['count']), fg='green'))
+            output += u'{:20}{}\n'.format(click.style(match['month'], bold=True),
+                                          click.style(u'{:20,d}'.format(match['count']), fg='green'))
 
     click.echo_via_pager(output)
 
@@ -929,7 +958,7 @@ def radar():
     key = get_api_key()
     api = shodan.Shodan(key)
 
-    from shodan.cli.worldmap import launch_map
+    from toolkit.shodan.cli.worldmap import launch_map
 
     try:
         launch_map(api)
