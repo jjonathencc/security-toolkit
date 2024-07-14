@@ -2,7 +2,7 @@ import gzip
 import requests
 import json
 
-from .exception import APIError
+from toolkit.utilities.exception import APIError
 
 try:
     basestring

@@ -2,11 +2,10 @@
 """
 shodan.client
 ~~~~~~~~~~~~~
-
 This module implements the Shodan API.
-
 :copyright: (c) 2014- by John Matherly
 """
+
 import math
 import os
 import time
@@ -14,7 +13,7 @@ import time
 import requests
 import json
 
-from .exception import APIError
+from toolkit.utilities.exception import APIError
 from .helpers import create_facet_string
 from .stream import Stream
 

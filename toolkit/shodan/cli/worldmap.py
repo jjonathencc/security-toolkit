@@ -1,23 +1,21 @@
 """
 F-Secure Virus World Map console edition
 
-See README.md for more details
-
 Copyright 2012-2013 Jyrki Muukkonen
 
 Released under the MIT license.
-See LICENSE.txt or http://www.opensource.org/licenses/mit-license.php
+See http://www.opensource.org/licenses/mit-license.php
 
 ASCII map in map-world-01.txt is copyright:
  "Map 1998 Matthew Thomas. Freely usable as long as this line is included"
-
 """
+
 import curses
 import locale
 import random
 import time
 
-from toolkit.shodan.exception import APIError
+from toolkit.utilities.exception import APIError
 from toolkit.shodan.helpers import get_ip
 
 MAPS = {

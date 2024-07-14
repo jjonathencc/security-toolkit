@@ -2,7 +2,7 @@ import requests
 import json
 import ssl
 
-from .exception import APIError
+from toolkit.utilities.exception import APIError
 
 
 class Stream:

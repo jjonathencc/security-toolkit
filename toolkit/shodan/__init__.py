@@ -18,7 +18,7 @@ from toolkit.shodan.cli.helpers import async_spinner, get_banner_field, escape_d
 from toolkit.shodan.cli.host import HOST_PRINT
 from toolkit.shodan.cli.settings import COLORIZE_FIELDS
 from toolkit.shodan.client import Shodan
-from toolkit.shodan.exception import APIError
+from toolkit.utilities.exception import APIError
 
 api_key = os.getenv('SHODAN_API_KEY')
 if api_key:
@@ -28,10 +28,9 @@ else:
 
 
 def get_api():
-    if api:
-        return api
-    else:
-        raise ValueError("API key not set. Please set the SHODAN_API_KEY environment variable.")
+    if api is None:
+        raise click.ClickException("API key not set. Please set the SHODAN_API_KEY environment variable.")
+    return api
 
 
 def create_alert(name, ip, expires=0):

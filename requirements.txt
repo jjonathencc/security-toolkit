@@ -5,9 +5,9 @@ aiohttp~=3.9.5
 setuptools~=70.0.0
 click-plugins
 colorama
-XlsxWriter
+XlsxWriter~=3.2.0
 ipaddress;python_version<='2.7'
-tldextract
+tldextract~=5.1.2
 aioresponses~=0.7.2
 astroid~=2.5.7
 async-timeout~=3.0.1
@@ -52,3 +52,4 @@ webencodings~=0.5.1
 wrapt~=1.12.1
 yarl~=1.9.4
 nest_asyncio~=1.6.0
+validators~=0.32.0
