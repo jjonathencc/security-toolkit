@@ -3,32 +3,38 @@ import asyncio
 import nest_asyncio
 from .urlscan import UrlScan
 
-# Apply the nest_asyncio patch
 nest_asyncio.apply()
 
-# Get API key from environment variable or set it to None
 api_key = os.getenv('URLSCAN_API_KEY')
 
-# Create a single instance of UrlScan to use within this module
 if api_key:
-    _urlscanner = UrlScan(api_key=api_key)
+    _urlscan = UrlScan(api_key=api_key)
 else:
-    _urlscanner = None
+    _urlscan = None
 
 
-def investigate(url, private=False):
-    """Submits a URL scan request and prints the results."""
-    if _urlscanner:
-        result = asyncio.run(_urlscanner.investigate(url, private))
-        print(result)
+def get_result_data(scan_uuid, show=True):
+    if _urlscan:
+        result = asyncio.run(_urlscan.get_result_data(scan_uuid))
+        show and print(result)
+        return result
     else:
         raise ValueError("API key not set. Please set the URLSCAN_API_KEY environment variable.")
 
 
-def search(query):
-    """Searches the URL scan database and prints the results."""
-    if _urlscanner:
-        result = asyncio.run(_urlscanner.search(query))
-        print(result)
+def investigate(url, private=False, show=True):
+    if _urlscan:
+        result = asyncio.run(_urlscan.investigate(url, private))
+        show and print(result)
+        return result
+    else:
+        raise ValueError("API key not set. Please set the URLSCAN_API_KEY environment variable.")
+
+
+def search(query, show=True):
+    if _urlscan:
+        result = asyncio.run(_urlscan.search(query))
+        show and print(result)
+        return result
     else:
         raise ValueError("API key not set. Please set the URLSCAN_API_KEY environment variable.")

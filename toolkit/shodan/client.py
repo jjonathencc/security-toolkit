@@ -353,45 +353,45 @@ class Shodan:
             method = method.lower()
             if method == 'post':
                 if json_data:
-                    data = self._session.post(base_url + function, params=params,
-                                              data=json.dumps(json_data),
-                                              headers={'content-type': 'application/json'},
-                                              )
+                    response = self._session.post(base_url + function, params=params,
+                                                  data=json.dumps(json_data),
+                                                  headers={'content-type': 'application/json'},
+                                                  )
                 else:
-                    data = self._session.post(base_url + function, params)
+                    response = self._session.post(base_url + function, params=params)
             elif method == 'put':
-                data = self._session.put(base_url + function, params=params)
+                response = self._session.put(base_url + function, params=params)
             elif method == 'delete':
-                data = self._session.delete(base_url + function, params=params)
+                response = self._session.delete(base_url + function, params=params)
             else:
-                data = self._session.get(base_url + function, params=params)
+                response = self._session.get(base_url + function, params=params)
             self._api_query_time = time.time()
         except Exception:
             raise APIError('Unable to connect to Shodan')
 
         # Check that the API key wasn't rejected
-        if data.status_code == 401:
+        if response.status_code == 401:
             try:
                 # Return the actual error message if the API returned valid JSON
-                error = data.json()['error']
+                error = response.json()['error']
             except Exception as e:
                 # If the response looks like HTML then it's probably the 401 page that nginx returns
                 # for 401 responses by default
-                if data.text.startswith('<'):
+                if response.text.startswith('<'):
                     error = 'Invalid API key'
                 else:
                     # Otherwise lets raise the error message
                     error = u'{}'.format(e)
 
             raise APIError(error)
-        elif data.status_code == 403:
+        elif response.status_code == 403:
             raise APIError('Access denied (403 Forbidden)')
-        elif data.status_code == 502:
+        elif response.status_code == 502:
             raise APIError('Bad Gateway (502)')
 
         # Parse the text into JSON
         try:
-            data = data.json()
+            data = response.json()
         except ValueError:
             raise APIError('Unable to parse JSON response')
 
@@ -508,8 +508,8 @@ class Shodan:
 
         :param port: The port that should get scanned.
         :type port: int
-        :param port: The name of the protocol as returned by the protocols() method.
-        :type port: str
+        :param protocol: The name of the protocol as returned by the protocols() method.
+        :type protocol: str
 
         :returns: A dictionary with a unique ID to check on the scan progress.
         """

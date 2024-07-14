@@ -14,6 +14,9 @@
 
 """VT module."""
 
+import asyncio
+import os
+
 from .client import *
 from .error import *
 from .feed import *
@@ -21,34 +24,51 @@ from .iterator import *
 from .object import *
 from .version import __version__
 
-import os
-import asyncio
-
-# Get API key from environment variable or set it to None
 api_key = os.getenv('VIRUSTOTAL_API_KEY')
 
-# Create a single instance of Client to use within this module
 if api_key:
     _vt_client = Client(apikey=api_key)
 else:
     _vt_client = None
 
 
-def scan_url(url, wait_for_completion=False):
-    """Scans a URL using the VirusTotal API and prints the results."""
+def scan_url(url, wait_for_completion=False, show=True):
     if _vt_client:
         result = asyncio.run(_vt_client.scan_url_async(url, wait_for_completion))
-        print(result)
+        show and print(result)
+        return result
     else:
         raise ValueError("API key not set. Please set the VIRUSTOTAL_API_KEY environment variable.")
 
 
-def get_url_analysis(url):
-    """Fetches and prints detailed analysis for a URL from VirusTotal."""
+def get_url_analysis(url, show=True):
     if _vt_client:
         url_id = client.url_id(url)
         url_analysis = _vt_client.get_object("/urls/{}", url_id)
-        print(f"Times Submitted: {url_analysis.times_submitted}")
-        print(f"Last Analysis Stats: {url_analysis.last_analysis_stats}")
+        show and print(url_analysis)
+        return url_analysis
+    else:
+        raise ValueError("API key not set. Please set the VIRUSTOTAL_API_KEY environment variable.")
+
+
+def scan_file(file_path, wait_for_completion=False, show=True):
+    if _vt_client:
+        with open(file_path, "rb") as f:
+            result = asyncio.run(_vt_client.scan_file_async(f, wait_for_completion))
+            show and print(result)
+            return result
+    else:
+        raise ValueError("API key not set. Please set the VIRUSTOTAL_API_KEY environment variable.")
+
+
+def get_file_analysis(file_hash, show=True):
+    if _vt_client:
+        file_analysis = _vt_client.get_object("/files/{}", file_hash)
+        if show:
+            print(f"Size: {file_analysis.size}")
+            print(f"SHA-256: {file_analysis.sha256}")
+            print(f"Type: {file_analysis.type_tag}")
+            print(f"Last Analysis Stats: {file_analysis.last_analysis_stats}")
+        return file_analysis
     else:
         raise ValueError("API key not set. Please set the VIRUSTOTAL_API_KEY environment variable.")

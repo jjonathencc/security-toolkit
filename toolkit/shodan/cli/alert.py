@@ -8,7 +8,7 @@ from ipaddress import ip_address
 
 from collections import defaultdict
 from operator import itemgetter
-from toolkit.shodan import APIError
+from toolkit.shodan.exception import APIError
 from toolkit.shodan.cli.helpers import get_api_key
 from toolkit.shodan.helpers import open_file, write_banner
 from time import sleep
