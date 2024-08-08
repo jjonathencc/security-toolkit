@@ -56,7 +56,6 @@ requests-file==2.1.0
 requests-toolbelt==0.9.1
 rfc3986==1.4.0
 SecretStorage==3.1.2
--e git+https://github.com/jjonathencc/security-toolkit.git@534f9926827f3dc3f20e15bc51a0c540ef89a951#egg=security_toolkit
 six==1.16.0
 tldextract==5.1.2
 toml==0.10.2

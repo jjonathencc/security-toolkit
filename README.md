@@ -9,7 +9,7 @@ Security Toolkit is a powerful package that integrates multiple cybersecurity se
 To install the Toolkit, you need to have Python 3.6 or higher. You can install the package via pip:
 
 ```
-pip install toolkit
+pip install security-toolkit
 ```
 
 ## Setup

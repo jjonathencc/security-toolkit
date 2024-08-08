@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="security-toolkit",
-    version="0.3",
+    version="0.4",
     author="Jonathen Cuvelier",
     description="A collection of tools for security analysis",
     packages=find_packages(),
