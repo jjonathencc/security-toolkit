@@ -1,10 +1,11 @@
+import asyncio
 import json
 import os
-import asyncio
 from pathlib import Path
 
 import click
 import nest_asyncio
+
 from .urlscan import UrlScan
 from ..utilities.exception import APIError
 
@@ -18,20 +19,22 @@ else:
     api = None
 
 
-def investigate_url(url, private=False):
+def investigate_url(url, private=False, standalone=True):
     """Investigate a URL."""
     try:
         result = asyncio.run(api.investigate(url, private))
         if not result:
             click.secho("Investigation failed. Please try again later.", fg='red')
         else:
-            if result.keys() >= {"report", "screenshot", "dom"}:
+            if result.keys() >= {"report", "screenshot", "dom"} and standalone:
                 click.secho(f"{'Scan report URL':<31}", fg='cyan', nl=False)
                 click.secho(result['report'], fg='green')
                 click.secho(f"{'Screenshot download location':<31}", fg='cyan', nl=False)
                 click.secho(result['screenshot'], fg='green')
                 click.secho(f"{'DOM download location':<31}", fg='cyan', nl=False)
                 click.secho(result['dom'], fg='green')
+            else:
+                return result['scan_uuid']
     except APIError as e:
         raise click.ClickException(e.value)
 
@@ -50,15 +53,18 @@ def retrieve_result(uuid):
         raise click.ClickException(e.value)
 
 
-def submit_scan_request(url, private=False):
+def submit_scan_request(url, private=False, standalone=True):
     """Submit a URL scan request."""
     try:
         scan_uuid = asyncio.run(api.submit_scan_request(url, private))
         if not scan_uuid:
             click.secho(f"Failed to submit scan request for {url}. Please try again later.", fg='red')
         else:
-            click.secho(f"{'Scan UUID':<31}", fg='cyan', nl=False)
-            click.secho(scan_uuid, fg='green')
+            if standalone:
+                click.secho(f"{'Scan UUID':<31}", fg='cyan', nl=False)
+                click.secho(scan_uuid, fg='green')
+            else:
+                return scan_uuid
     except APIError as e:
         raise click.ClickException(e.value)
 
@@ -82,12 +88,14 @@ def search_query(query):
         raise click.ClickException(e.value)
 
 
-def get_report_data(uuid):
+def get_report_data(uuid, standalone=True):
     """Get report data for a URL scan."""
     try:
         results = asyncio.run(api.get_result_data(uuid))
-        if results:
+        if results and standalone:
             print_report(results)
+        elif results:
+            return results
     except APIError as e:
         raise click.ClickException(e.value)
 

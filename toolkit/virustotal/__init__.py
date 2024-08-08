@@ -55,13 +55,17 @@ def file_scan(path, wait_for_completion=True):
         raise click.ClickException(e.value)
 
 
-def url_scan(url, wait_for_completion=True):
+def url_scan(url, wait_for_completion=True, standalone=True):
     try:
         with get_api() as api:
-            click.secho('Scanning URL, please wait...', fg='yellow')
-            click.echo('')
-            analysis = api.scan_url(url, wait_for_completion)
-            print_object(analysis)
+            if standalone:
+                click.secho('Scanning URL, please wait...', fg='yellow')
+                click.echo('')
+                analysis = api.scan_url(url, wait_for_completion)
+                print_object(analysis)
+            else:
+                analysis = api.scan_url(url, wait_for_completion)
+                return analysis
     except APIError as e:
         raise click.ClickException(e.value)
 
