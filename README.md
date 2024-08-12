@@ -1,4 +1,4 @@
-# Security Toolkit Documentation
+# Security Toolkit
 
 ## Overview
 
