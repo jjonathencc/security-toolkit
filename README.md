@@ -146,10 +146,6 @@ If you encounter any issues or bugs, please report them on the GitHub issues pag
 
 If you add a new feature, please update this documentation accordingly. Good documentation helps others understand how to use your feature.
 
-### Testing
-
-Make sure to add tests for your code. Tests help ensure that your code works as expected and prevent future bugs.
-
 ## Examples
 
 ### Example: Investigating a URL
