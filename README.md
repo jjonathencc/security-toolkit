@@ -1,7 +1,5 @@
 # Security Toolkit
 
-## Overview
-
 Security Toolkit is a powerful package that integrates multiple cybersecurity services, including Shodan, URLScan, and VirusTotal. It allows users to investigate URLs, IP addresses, and other digital assets using these services and provides formatted outputs for easy analysis.
 
 ## Installation
@@ -90,7 +88,7 @@ virustotal.print_object(vt_result)
 
 ## Contributing
 
-We welcome contributions to the Toolkit. Here are some guidelines to help you get started:
+Contributions are welcome. Here are some guidelines to help you get started:
 
 ### Setting Up Your Development Environment
 
@@ -138,7 +136,7 @@ We welcome contributions to the Toolkit. Here are some guidelines to help you ge
 
 ### Code Style
 
-Please follow PEP 8 guidelines for Python code. You can use tools like `flake8` to check your code style.
+Please follow PEP 8 guidelines for Python code.
 
 ### Reporting Issues
 
@@ -146,7 +144,7 @@ If you encounter any issues or bugs, please report them on the GitHub issues pag
 
 ### Documentation
 
-If you add a new feature, please update the documentation accordingly. Good documentation helps others understand how to use your feature.
+If you add a new feature, please update this documentation accordingly. Good documentation helps others understand how to use your feature.
 
 ### Testing
 
